@@ -1,4 +1,3 @@
-//mod day1;
 mod day2;
 use day2::do_thing as dt;
 

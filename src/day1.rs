@@ -3,7 +3,7 @@ use std::collections::HashSet;
 
 pub fn do_thing()
 {
-    do_thing1();
+    do_thing2();
 }
 
 pub fn do_thing1()
