@@ -1,9 +1,9 @@
 use super::tools;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 pub fn do_thing()
 {
-    do_thing1();
+    do_thing2();
 }
 
 fn do_thing1()
@@ -34,26 +34,20 @@ fn do_thing1()
     println!("2: {}, 3: {}", total2, total3);
     println!("{}", total2*total3);
 }
-/*
+
 fn do_thing2()
 {
-    let mut freqs = Vec::<i32>::new();
-    let mut set = HashSet::<i32>::new();
-    let mut total : i32 = 0;
-    set.insert(total);
-    let input_vec = tools::get_string_input("input/day1");
-
-    for line in &input_vec {
-        freqs.push(line.parse::<i32>().expect("Hej"));
-    }
-
-    'outer: loop {
-        for freq in &freqs {
-            total += freq;
-            if !set.insert(total) {
-                break 'outer;
+    let input_vec = tools::get_string_input("input/day2");
+    for i in 0..input_vec[0].len()
+    {
+        let mut set = HashSet::<String>::new();
+        for line in &input_vec {
+            let mut stub = line.to_string();
+            stub.remove(i);
+            if !set.insert(stub.clone()) {
+                println!("{}", stub);
+                return;
             }
         }
     }
-    println!("{}", total);
-}*/
+}
