@@ -1,5 +1,8 @@
-mod day3;
-use day3::do_thing as dt;
+extern crate chrono;
+extern crate regex;
+
+mod day4;
+use day4::do_thing as dt;
 
 pub mod tools;
 
