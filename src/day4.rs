@@ -23,9 +23,11 @@ impl DateEntry {
     }
 }
 
-struct Guard { // Use map <id, array> instead?
+struct Answer {
     id: usize,
-    sleeping: [usize; 60],
+    g_max: usize,
+    l_max: usize,
+    minute: usize,
 }
 
 fn do_thing1()
@@ -37,21 +39,46 @@ fn do_thing1()
     for line in input_vec {
         let date = get_rounded_date(re_date.find(line.as_str()).unwrap().as_str());
         let entry = map.entry(date).or_insert(DateEntry::new());
-        match &line[19..19] {
-            "w" => entry.woke.push(re_date.captures(line.as_str()).unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap()),
-            "f" => entry.slept.push(re_date.captures(line.as_str()).unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap()),
-            "G" => {
+        match &line.chars().nth(19).unwrap() {
+            'w' => {
+                entry.woke.push(re_date.captures(line.as_str()).unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap());
+            }
+            'f' => {
+                entry.slept.push(re_date.captures(line.as_str()).unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap());
+            }
+            'G' => {
                 entry.id = re_id.captures(line.as_str()).unwrap().get(1).unwrap().as_str().parse::<usize>().unwrap();
             },
-            _ => ()
+            x => println!("{}", x),
         }
     }
-    // Loop through date map
-    // sort woke and slept Vecs
-    // add sleep time based on woke and slept minutes, per guard id
+    println!("{}", map.len());
+    let mut guard_map = HashMap::<usize, [usize; 60]>::new();
+    for (_d, mut e) in map {
+        e.slept.sort_unstable();
+        e.woke.sort_unstable();
+        let mut guard = guard_map.entry(e.id).or_insert([0usize; 60]);
+        for i in 0..e.slept.len() {
+            for t in e.slept[i]..e.woke[i] {
+                guard[t] += 1;
+            }
+        }
+    }
+    let mut a = Answer {id: 0, g_max: 0, l_max: 0, minute: 0};
+    println!("{}", guard_map.len());
+    for (id, arr) in guard_map {
+        //if arr.iter().sum::<usize>() > a.g_max { // Part 1
+        if *arr.iter().max().unwrap() > a.l_max { // Part 2
+            a.id = id;
+            a.g_max = arr.iter().sum();
+            a.l_max = *arr.iter().max().unwrap();
+            a.minute = arr.iter().position(|&x| x == a.l_max).unwrap();
+        }
+    }
+    println!("ID: {}\nTotal: {}\nMinute: {}", a.id, a.g_max, a.minute);
+    println!("Answer: {}", a.minute*a.id);
 }
 
-// Input 
 fn get_rounded_date(date_string: &str) -> NaiveDate {
     //println!("{}", date_string);
     let date_time = NaiveDateTime::parse_from_str(date_string, "%Y-%m-%d %H:%M").unwrap();
@@ -60,16 +87,4 @@ fn get_rounded_date(date_string: &str) -> NaiveDate {
         ret_date += Duration::days(1);
     }
     return ret_date;
-}
-
-fn add_sleeping_time(arr: &mut [usize; 60], begin: usize, end: usize)
-{
-    for i in begin..end {
-        arr[i] += 1;
-    }
-}
-
-fn do_thing2()
-{
-    let input_vec = tools::get_string_input("input/day4");
 }
